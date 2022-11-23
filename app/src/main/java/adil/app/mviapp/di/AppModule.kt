@@ -2,6 +2,7 @@ package adil.app.mviapp.di
 
 import adil.app.mviapp.data.api.APIService
 import adil.app.mviapp.data.repository.PostRepository
+import adil.app.mviapp.utils.AppConstants.BASE_URL
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,7 +18,7 @@ class AppModule {
     fun providesApiService(): APIService =
         Retrofit
             .Builder()
-            .baseUrl("https://jsonplaceholder.typicode.com/")
+            .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(APIService::class.java)
