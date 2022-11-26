@@ -23,10 +23,11 @@ class MainViewModel @Inject constructor(
         get() = _state
 
     init {
+        /** Step 1 : Ready to handle the incoming intent */
         handleIntent()
     }
 
-    /** Step 2 : Process the intent */
+    /** Step 3 : Process the intent */
     private fun handleIntent() {
         viewModelScope.launch {
             mainIntent.collect { intent ->
@@ -37,7 +38,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    /** Step 3 : Update the state based on the intent */
+    /** Step 4 : Update the state based on the intent */
     private fun fetchPosts() {
         viewModelScope.launch(Dispatchers.IO) {
             _state.value = MainViewState.Loading

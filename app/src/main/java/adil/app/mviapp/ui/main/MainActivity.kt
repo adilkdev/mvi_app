@@ -28,13 +28,13 @@ class MainActivity : AppCompatActivity() {
         _binding.recyclerView.adapter = adapter
         observeViewModels()
 
-        /** Step 1 : Provide the intent */
+        /** Step 2 : Provide the intent */
         lifecycleScope.launch {
             viewModel.mainIntent.emit(MainIntent.GetPosts)
         }
     }
 
-    /** Step 4 : Update the view as per the state */
+    /** Step 5 : Update the view as per the state */
     private fun observeViewModels() {
         lifecycleScope.launch() {
             viewModel.state.collect { viewState ->
