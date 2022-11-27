@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -23,10 +24,11 @@ class MainViewModel @Inject constructor(
         get() = _state
 
     init {
+        /** Step 1 : Ready to handle the incoming intent */
         handleIntent()
     }
 
-    /** Step 2 : Process the intent */
+    /** Step 3 : Process the intent */
     private fun handleIntent() {
         viewModelScope.launch {
             mainIntent.collect { intent ->
@@ -37,13 +39,15 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    /** Step 3 : Update the state based on the intent */
+    /** Step 4 : Update the state based on the intent */
     private fun fetchPosts() {
         viewModelScope.launch(Dispatchers.IO) {
             _state.value = MainViewState.Loading
             try {
+                delay(1500)
                 _state.value = MainViewState.Success(data = postRepository.getPosts())
             } catch (exception: Exception) {
+                delay(1500)
                 _state.value = MainViewState.Error(errorMessage = exception.message.toString())
             }
         }

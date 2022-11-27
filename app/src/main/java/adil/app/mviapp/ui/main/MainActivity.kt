@@ -7,12 +7,15 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -25,39 +28,40 @@ import kotlinx.coroutines.launch
 class MainActivity : AppCompatActivity() {
 
     private val viewModel: MainViewModel by viewModels()
-    val postList: MutableState<List<Post>> = mutableStateOf(listOf())
+    private val postList: MutableState<List<Post>> = mutableStateOf(listOf())
+    private var isLoading = mutableStateOf(true)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             PostList(postList)
+            ProgressBar(isLoading = isLoading)
         }
         observeViewModels()
 
-        /** Step 1 : Provide the intent */
+        /** Step 2 : Provide the intent */
         lifecycleScope.launch {
             viewModel.mainIntent.emit(MainIntent.GetPosts)
         }
     }
 
-    /** Step 4 : Update the view as per the state */
+    /** Step 5 : Update the view as per the state */
     private fun observeViewModels() {
         lifecycleScope.launch() {
             viewModel.state.collect { viewState ->
                 when (viewState) {
                     is MainViewState.Initial -> {
-                        //_binding.progressBar.visibility = View.GONE
+                        isLoading.value = true
                     }
                     is MainViewState.Loading -> {
-                        //_binding.progressBar.visibility = View.VISIBLE
+                        isLoading.value = true
                     }
                     is MainViewState.Success -> {
                         postList.value = viewState.data
-                        //_binding.progressBar.visibility = View.GONE
-                        //adapter.addPosts(viewState.data)
+                        isLoading.value = false
                     }
                     is MainViewState.Error -> {
-                        //_binding.progressBar.visibility = View.GONE
+                        isLoading.value = false
                     }
                 }
             }
@@ -74,6 +78,19 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+    @Composable
+    fun ProgressBar(isLoading: State<Boolean>) {
+        val alpha = if (isLoading.value) 1f else 0f
+        Column(
+            modifier = Modifier.fillMaxHeight().fillMaxWidth().alpha(alpha),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            CircularProgressIndicator()
+        }
+    }
+
 
     @Composable
     fun PostItem(title: String, description: String) {
